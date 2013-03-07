@@ -1,5 +1,5 @@
 //this file is part of MimeTools (plugin for Notepad++)
-//Copyright (C)2007 Don HO <donho@altern.org>
+//Copyright (C)2013 Robert Meakins <rmeakins@users.sf.net>
 //
 //This program is free software; you can redistribute it and/or
 //modify it under the terms of the GNU General Public License
@@ -15,17 +15,19 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-#ifndef NPP_B64_H
-#define NPP_B64_H
+#ifndef NPP_SAML_H
+#define NPP_SAML_H
 
-#define ASCII_BITLEN 8
-#define B64_BITLEN 6
-#include <windows.h>
+#include "b64.h"
+#include "url.h"
 
-size_t getBase64LenFromAsciiLen(size_t asciiStrLen);
-size_t getAsciiLenFromBase64Len(size_t base64StrLen);
+const int SAML_DECODE_ERROR_URLDECODE = -1;
+const int SAML_DECODE_ERROR_BASE64DECODE = -2;
+const int SAML_DECODE_ERROR_INFLATE = -3;
 
-size_t asciiToBase64(char *dest, const UCHAR *asciiStr, size_t asciiStrLen);
-int base64ToAscii(char *dest, const char *base64Str);
 
-#endif //NPP_B64_H
+const int SAML_MESSAGE_MAX_SIZE = 200000;
+
+int samlDecode(char *dest, const char *samlStr, int bufLength);
+
+#endif //NPP_SAML_H

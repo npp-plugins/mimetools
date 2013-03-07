@@ -363,6 +363,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\saml.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tinflate.c"
+				>
+			</File>
+			<File
 				RelativePath=".\url.cpp"
 				>
 			</File>
@@ -393,7 +401,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\saml.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Scintilla.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tinf.h"
 				>
 			</File>
 			<File

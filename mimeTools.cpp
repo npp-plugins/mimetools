@@ -1,4 +1,4 @@
-//this file is part of Notepad++
+//this file is part of MimeTools (plugin for Notepad++)
 //Copyright (C)2007 Don HO <donho@altern.org>
 //
 //This program is free software; you can redistribute it and/or
@@ -20,10 +20,11 @@
 #include "b64.h"
 #include "qp.h"
 #include "url.h"
+#include "saml.h"
 
 
 const TCHAR PLUGIN_NAME[] = TEXT("MIME Tools");
-const int nbFunc = 12;
+const int nbFunc = 14;
 
 HINSTANCE _hInst;
 NppData nppData;
@@ -50,9 +51,12 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 			funcItem[7]._pFunc = convertURLMinEncode;
 			funcItem[8]._pFunc = convertURLFullEncode;
 			funcItem[9]._pFunc = convertURLDecode;
-
+			
 			funcItem[10]._pFunc = NULL;
-			funcItem[11]._pFunc = about;
+			funcItem[11]._pFunc = convertSamlDecode;
+
+			funcItem[12]._pFunc = NULL;
+			funcItem[13]._pFunc = about;
 
 			lstrcpy(funcItem[0]._itemName, TEXT("Base64 Encode"));
 			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with Unix EOL"));
@@ -71,7 +75,11 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 			
 			lstrcpy(funcItem[10]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[11]._itemName, TEXT("About"));
+			lstrcpy(funcItem[11]._itemName, TEXT("SAML Decode"));
+			
+			lstrcpy(funcItem[12]._itemName, TEXT("-SEPARATOR-"));
+
+			lstrcpy(funcItem[13]._itemName, TEXT("About"));
 
 			funcItem[0]._init2Check = false;
 			funcItem[1]._init2Check = false;
@@ -85,6 +93,8 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 			funcItem[9]._init2Check = false;
 			funcItem[10]._init2Check = false;
 			funcItem[11]._init2Check = false;
+			funcItem[12]._init2Check = false;
+			funcItem[13]._init2Check = false;
 
 			// If you don't need the shortcut, you have to make it NULL
 			funcItem[0]._pShKey = NULL;
@@ -99,6 +109,8 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 			funcItem[9]._pShKey = NULL;
 			funcItem[10]._pShKey = NULL;
 			funcItem[11]._pShKey = NULL;
+			funcItem[12]._pShKey = NULL;
+			funcItem[13]._pShKey = NULL;
 		}
 		break;
 
@@ -452,4 +464,54 @@ void about()
 	int y = center.y - (dlgRect.bottom - dlgRect.top)/2;
 
 	::SetWindowPos(hSelf, HWND_TOP, x, y, (dlgRect.right - dlgRect.left), (dlgRect.bottom - dlgRect.top), SWP_SHOWWINDOW);
+}
+
+void convertSamlDecode()
+{
+  HWND hCurrScintilla = getCurrentScintillaHandle();
+  size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
+  
+  if (bufLength == 0) return;
+
+  char *selectedText = new char[bufLength];
+  char *samlDecodedText = new char[SAML_MESSAGE_MAX_SIZE];
+  ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
+
+  // this line is added to walk around Scintilla 201 bug
+  bufLength = strlen(selectedText) + 1;
+
+
+  int len = samlDecode(samlDecodedText, selectedText, int(bufLength));
+  
+  switch (len) 
+  {
+    case 0:
+	  ::MessageBox(nppData._nppHandle, TEXT("SAML Decode returned zero size."), TEXT("SAML Decode"), MB_OK);
+	  break;
+    case SAML_DECODE_ERROR_URLDECODE:
+	  ::MessageBox(nppData._nppHandle, TEXT("Could not URL Decode text."), TEXT("SAML Decode"), MB_OK);
+	  break;
+	case SAML_DECODE_ERROR_BASE64DECODE:
+	  ::MessageBox(nppData._nppHandle, TEXT("Could not BASE64 Decode text after URL Decoding."), TEXT("SAML Decode"), MB_OK);
+	  break;
+	case SAML_DECODE_ERROR_INFLATE:
+	  ::MessageBox(nppData._nppHandle, TEXT("Could not inflate text after BASE64 Decoding."), TEXT("SAML Decode"), MB_OK);
+	  break;
+	default:
+      size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
+      size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
+      if (end < start)
+      {
+        size_t tmp = start;
+        start = end;
+        end = tmp;
+      }
+      ::SendMessage(hCurrScintilla, SCI_SETTARGETSTART, start, 0);
+      ::SendMessage(hCurrScintilla, SCI_SETTARGETEND, end, 0);
+      ::SendMessage(hCurrScintilla, SCI_REPLACETARGET, len, (LPARAM)samlDecodedText);
+      ::SendMessage(hCurrScintilla, SCI_SETSEL, start, start+len);
+  }
+  
+  delete [] selectedText;
+  delete [] samlDecodedText;
 }

@@ -1,4 +1,4 @@
-//this file is part of Notepad++
+//this file is part of MimeTools (plugin for Notepad++)
 //Copyright (C)2007 Don HO <donho@altern.org>
 //
 //This program is free software; you can redistribute it and/or
@@ -18,8 +18,8 @@
 #ifndef NPP_TOOLS_H
 #define NPP_TOOLS_H
 
-#define VERSION_VALUE "1.7\0"
-#define VERSION_DIGITALVALUE 1, 7, 0, 0
+#define VERSION_VALUE "1.8\0"
+#define VERSION_DIGITALVALUE 1, 8, 0, 0
 
 #define IDD_ABOUTBOX 250
 
@@ -37,6 +37,8 @@ void convertToAsciiFromQuotedPrintable();
 void convertURLMinEncode();
 void convertURLFullEncode();
 void convertURLEncode(bool);
+void convertURLDecode();
+void convertSamlDecode();
 void convertURLDecode();
 void about();
 

@@ -1,4 +1,4 @@
-//this file is part of Notepad++
+//this file is part of MimeTools (plugin for Notepad++)
 //Copyright (C)2007 Don HO <donho@altern.org>
 //
 //This program is free software; you can redistribute it and/or
