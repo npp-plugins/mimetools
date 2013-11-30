@@ -199,7 +199,11 @@ void asciiToBase64(bool doFormat)
 
     UCHAR * pAsciiText = new UCHAR[asciiTextLen+1];
     
-    ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)pAsciiText);
+	TextRange tr;
+	tr.chrg.cpMin = (long)start;
+	tr.chrg.cpMax = (long)end;
+	tr.lpstrText = (char *)pAsciiText;
+	::SendMessage(hCurrScintilla, SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
 
 	size_t b64Len = getBase64LenFromAsciiLen(asciiTextLen);
 	char * pBase64Text = new char[b64Len+1];
