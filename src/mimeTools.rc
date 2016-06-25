@@ -1,0 +1,61 @@
+//this file is part of MimeTools (plugin for Notepad++)
+//Copyright (C)2007 Don HO <donho@altern.org>
+//
+//This program is free software; you can redistribute it and/or
+//modify it under the terms of the GNU General Public License
+//as published by the Free Software Foundation; either
+//version 2 of the License, or (at your option) any later version.
+//
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+//
+//You should have received a copy of the GNU General Public License
+//along with this program; if not, write to the Free Software
+//Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+#include <windows.h>
+#include "mimeTools.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION	VERSION_DIGITALVALUE
+PRODUCTVERSION	VERSION_DIGITALVALUE
+FILEFLAGSMASK	0x3fL
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+	BLOCK	"VarFileInfo"
+	BEGIN
+		VALUE	"Translation",	0x409,	1200
+	END
+	BLOCK	"StringFileInfo"
+	BEGIN
+		BLOCK "040904b0"
+		BEGIN
+			VALUE	"CompanyName",	"Don HO don.h@free.fr\0"
+			VALUE	"FileDescription",	"Base64 encoder/decoder plugin for Notepad++\0"
+			VALUE	"FileVersion",	VERSION_VALUE
+			VALUE	"InternalName",	"base64.dll\0"
+			VALUE	"LegalCopyright",	"Copyright 2007 by Don HO\0"
+			VALUE	"OriginalFilename",	"base64.dll\0"
+			VALUE	"ProductName",	"mimeTools\0"
+			VALUE	"ProductVersion",	VERSION_VALUE
+		END
+	END
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 223, 130
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_BORDER | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Close",IDCLOSE,86,109,50,14
+    GROUPBOX        "MIME Tools",IDC_STATIC,10,9,201,93,BS_CENTER
+    LTEXT           "Author : Don HO",IDC_STATIC,30,26,54,8
+    LTEXT           "Version : ",IDC_STATIC,30,43,31,8
+    LTEXT           "Licence : GPL",IDC_STATIC,30,62,43,8
+    LTEXT           "Uses tinf - Copyright (c) 2003 Joergen Ibsen",IDC_STATIC,30,80,160,8
+    LTEXT           VERSION_VALUE, IDC_STATIC,65,43,19,8
+END

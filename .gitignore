@@ -1,0 +1,12 @@
+mimeTools.vcxproj.filters
+mimeTools.vcxproj.user
+no_ms_shit.props
+UpgradeLog.htm
+*.suo
+mimeTools.sln
+*.sdf
+mimeTools.ilk
+vs.proj/x64/
+vs.proj/Release/
+vs.proj/Debug/
+vs.proj/mimeTools.opensdf
