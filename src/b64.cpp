@@ -130,16 +130,15 @@ int base64ToAscii(char *dest, const char *base64Str)
 	for ( ; i < nbLoop ; i++)
 	{
 		size_t j = i * 4;
-
 		auto uc0 = base64IndexArray[base64Str[j]];
 		auto uc1 = base64IndexArray[base64Str[j+1]];
 		auto uc2 = base64IndexArray[base64Str[j+2]];
 		auto uc3 = base64IndexArray[base64Str[j+3]];
-
+/*
 		if ((uc0 == -1) || (uc1 == -1) || (uc2 == -1) || (uc3 == -1))
 			return -1;
-
-		if (base64Str[j+2] == '=') // && (uc3 == '=')
+*/
+		if (base64Str[j+2] == '=')
 		{
 			uc2 = uc3 = 0;
 			padd = b64_2padded;
@@ -164,12 +163,9 @@ int base64ToAscii(char *dest, const char *base64Str)
 		dest[k++] = static_cast<char>(p0 | p1);
 	}
 
-	//dest[k] = '\0';
 	if (padd == b64_1padded)
-	//	dest[k-1] = '\0';
 		return k-1;
 	else if (padd == b64_2padded)
-	//	dest[k-2] = '\0';
 		return k-2;
 
 	return k;
