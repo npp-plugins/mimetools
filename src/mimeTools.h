@@ -18,8 +18,8 @@
 #ifndef NPP_TOOLS_H
 #define NPP_TOOLS_H
 
-#define VERSION_VALUE "2.0\0"
-#define VERSION_DIGITALVALUE 2, 0, 0, 0
+#define VERSION_VALUE "2.1\0"
+#define VERSION_DIGITALVALUE 2, 1, 0, 0
 
 #define IDD_ABOUTBOX 250
 
