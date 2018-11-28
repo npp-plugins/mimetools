@@ -15,158 +15,152 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+#include "PluginInterface.h"
+#include "mimeTools.h"
 #include "b64.h"
-#include <stdint.h>
-#include <string.h>
+#include "qp.h"
+#include "url.h"
+#include "saml.h"
 
-
-char base64Array[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-int32_t base64IndexArray[123] =\
-{\
--1, -1, -1, -1, -1, -1, -1, -1,\
--1, -1, -1, -1, -1, -1, -1, -1,\
--1, -1, -1, -1, -1, -1, -1, -1,\
--1, -1, -1, -1, -1, -1, -1, -1,\
--1, -1, -1, -1, -1, -1, -1, -1,\
--1, -1, -1, 62, -1, -1, -1, 63,\
-52, 53, 54, 55 ,56, 57, 58, 59,\
-60, 61, -1, -1, -1, -1, -1, -1,\
--1,  0,  1,  2,  3,  4,  5,  6,\
- 7,  8,  9, 10, 11, 12, 13, 14,\
-15, 16, 17, 18, 19, 20, 21, 22,\
-23, 24, 25, -1, -1, -1, -1 ,-1,\
--1, 26, 27, 28, 29, 30, 31, 32,\
-33, 34, 35, 36, 37, 38, 39, 40,\
-41, 42, 43, 44, 45, 46, 47, 48,\
-49, 50, 51\
+char base64CharSet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+int base64CharMap[] = {  // base64 values or: -1 for illegal character, -2 to ignore character, and -3 for pad ('=')
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -1, -1, -2, -1, -1,  // <tab> <lf> & <cr> are ignored
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,  // <space> is ignored
+	52, 53, 54, 55 ,56, 57, 58, 59, 60, 61, -1, -1, -1, -3, -1, -1,  // '=' is the pad character
+	-1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1 ,-1,
+	-1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+	41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
 };
 
-size_t getBase64LenFromAsciiLen(size_t asciiStrLen)
+// base64Encode simply converts ascii to base64 with appropriate wrapping and padding. Encoding is done by loading
+// three ascii characters at a time into a bitField, and then extracting them as four base64 values.
+// returnString is assumed to be large enough to contain the result, and the function return is the length of the result
+
+int base64Encode(char *resultString, const char *asciiString, size_t asciiStringLength, size_t wrapLength, bool padFlag)
 {
-	size_t nbBase64Byte = asciiStrLen * ASCII_BITLEN / B64_BITLEN;
-	return nbBase64Byte + (((asciiStrLen * ASCII_BITLEN) % B64_BITLEN)?3:0);
-}
-
-size_t getAsciiLenFromBase64Len(size_t base64StrLen)
-{
-	if (base64StrLen % 4) return 0;
-	return  base64StrLen - base64StrLen / 4;
-}
-
-size_t asciiToBase64(char *dest, const UCHAR *asciiStr, size_t asciiStrLen)
-{
-	//size_t asciiStrLen = strlen(asciiStr);
-	size_t nbLoop = asciiStrLen / 3;
-	size_t nbByteRemain = asciiStrLen % 3;
-
-	size_t i = 0, k = 0;
-	for ( ; i < nbLoop ; i++)
+	size_t index; // input string index
+	size_t lineLength = 0; // Current line length
+	int resultLength = 0, // result string length
+		bitField, // assembled bit field (up to 3 ascii characters at a time)
+		bitOffset = -1, // offset into bit field (8 bit input: 16, 8, 0 -> 6 bit output: 18, 12, 6, 0)
+		endOffset; // end offset index value
+		
+	for (index = 0; index < asciiStringLength; )
 	{
-		size_t j = i * 3;
-		UCHAR p1, p2;
-
-		UCHAR a = asciiStr[j] >> 2;
-		dest[k++] = base64Array[a];
-		p1 = asciiStr[j] << 6;
-		p2 = asciiStr[j+1] >> 2;
-		UCHAR b = p1 | p2;
-		b >>= 2;
-		dest[k++] = base64Array[b];
-
-		p1 = asciiStr[j+1] << 4;
-		p2 = asciiStr[j+2] >> 4;
-		UCHAR c = p1 | p2;
-		c >>= 2;
-		dest[k++] = base64Array[c];
-
-		p2 = asciiStr[j+2] << 2;
-		UCHAR d = p2 >> 2;
-		dest[k++] = base64Array[d];
-	}
-
-	if (nbByteRemain == 1)
-	{
-		size_t j = i * 3;
-		UCHAR p;
-		dest[k++] = base64Array[asciiStr[j] >> 2];
-
-		p = asciiStr[j] << 6;
-		dest[k++] = base64Array[p >> 2];
-
-		dest[k++] = '=';
-		dest[k++] = '=';
-	}
-	else if (nbByteRemain == 2)
-	{
-		size_t j = i * 3;
-		UCHAR p1, p2;
-
-		dest[k++] = base64Array[asciiStr[j] >> 2];
-
-		p1 = asciiStr[j] << 6;
-		p2 = asciiStr[j+1] >> 2;
-		UCHAR b = p1 | p2;
-		dest[k++] = base64Array[b >> 2];
-
-		p1 = asciiStr[j+1] << 4;
-		dest[k++] = base64Array[p1 >> 2];
-
-		dest[k++] = '=';
-	}
-
-	dest[k] = '\0';
-	return k;//
-}
-
-int base64ToAscii(char *dest, const char *base64Str)
-{
-	size_t b64StrLen = strlen(base64Str);	
-	size_t nbLoop = b64StrLen / 4;
-
-	size_t i = 0;
-	int k = 0;
-
-	enum {b64_just, b64_1padded, b64_2padded} padd = b64_just;
-	for ( ; i < nbLoop ; i++)
-	{
-		size_t j = i * 4;
-		auto uc0 = base64IndexArray[base64Str[j]];
-		auto uc1 = base64IndexArray[base64Str[j+1]];
-		auto uc2 = base64IndexArray[base64Str[j+2]];
-		auto uc3 = base64IndexArray[base64Str[j+3]];
-/*
-		if ((uc0 == -1) || (uc1 == -1) || (uc2 == -1) || (uc3 == -1))
-			return -1;
-*/
-		if (base64Str[j+2] == '=')
+		bitField = 0;
+		for (bitOffset = 16; bitOffset >= 0 && index < asciiStringLength; bitOffset -= 8)
 		{
-			uc2 = uc3 = 0;
-			padd = b64_2padded;
+			bitField |= (UCHAR)asciiString[index++] << bitOffset;
 		}
-		else if (base64Str[j+3] == '=')
+		endOffset = bitOffset + 3; // end indicator
+		for (bitOffset = 18; bitOffset > endOffset; bitOffset -= 6)
 		{
-			uc3 = 0;
-			padd = b64_1padded;
+			if (wrapLength > 0 && lineLength++ >= wrapLength)
+			{
+				resultString[resultLength++] = '\n';
+				lineLength = 1;
+			}
+			resultString[resultLength++] = base64CharSet[(bitField >> bitOffset) & 0x3f];
 		}
-		auto p0 = uc0 << 2;
-		auto p1 = uc1 << 2;
-		p1 >>= 6;
-		dest[k++] = static_cast<char>(p0 | p1);
-
-		p0 = uc1 << 4;
-		p1 = uc2 << 2;
-		p1 >>= 4;
-		dest[k++] = static_cast<char>(p0 | p1);
-
-		p0 = uc2 << 6;
-		p1 = uc3;
-		dest[k++] = static_cast<char>(p0 | p1);
 	}
+	if (padFlag)
+	{
+		for (; bitOffset >= 0; bitOffset -= 6)
+		{
+			if (wrapLength > 0 && lineLength++ >= wrapLength)
+			{
+				resultString[resultLength++] = '\n';
+				lineLength = 1;
+			}
+			resultString[resultLength++] = '=';
+		}
+	}
+	return resultLength;
+}
 
-	if (padd == b64_1padded)
-		return k-1;
-	else if (padd == b64_2padded)
-		return k-2;
+// base64Decode converts base64 to ascii. But there are choices about what to do with illegal characters or
+// malformed strings. In this version there is a strict flag to indicate that the input must be a single
+// valid base64 string with no illegal characters, no extra padding, and no short segments. Otherwise
+// there is best effort to decode around illegal characters which ARE preserved in the output.
+// So  TWFyeQ==.aGFk.YQ.bGl0dGxl.bGFtYg==  decodes to  Mary.had.a.little.lamb  with five seperate
+// base64 strings decoded, each separated by the illegal character dot. In strict mode the first dot
+// would trigger a fatal error. Some other implementations choose to ignore illegal characters which
+// of course has it's own issues.
+// The four whitespace characters <CR> <LF> <TAB> and <SPACE> are always silently ignored. Decoding is
+// done by loading four base64 values at a time into a bitField, and then extracting them as three ascii
+// characters.
+// returnString is assumed to be large enough to contain the result, and the function return is the length of
+// the result, or a negative value in case of an error
 
-	return k;
+int base64Decode(char *resultString, const char *encodedString, size_t encodedStringLength, bool strictFlag)
+{
+	size_t index; // input string index
+
+	int resultLength = 0, // result string length
+		bitField, // assembled bit field (up to 3 ascii characters at a time)
+		bitOffset, // offset into bit field (6 bit intput: 18, 12, 6, 0 -> 8 bit output: 16, 8, 0)
+		endOffset, // end offset index value
+		charValue = 0, // character value
+		charIndex = 0, // character index
+		padLength = 0; // Pad characters seen
+
+	for (index = 0; index < encodedStringLength; )
+	{
+		bitField = 0;
+		for (bitOffset = 18; bitOffset >= 0 && index < encodedStringLength; )
+		{
+			charValue = (UCHAR)encodedString[index++];
+			charIndex = base64CharMap[charValue & 0x7f];
+			if (charIndex >= 0)
+			{
+				if (padLength > 0 && strictFlag)
+				{
+					return -1; // **ERROR** Data after pad character
+				}
+				bitField |= charIndex << bitOffset;
+				bitOffset -= 6;
+			}
+			else
+			{
+				if (charIndex != -2) // -2 is Ignore character - eg <cr> <lf> <space> <tab>
+				{
+					if (charIndex == -3) // -3 is Pad character '='
+					{
+						padLength++;
+						if (strictFlag && bitOffset > 6)
+						{
+							return -2; // **ERROR** Pad character in wrong place
+						}
+					}
+					else
+					{
+						break; // -1 is Illegal character - deal with it later
+					}
+				}
+			}
+		}
+		
+		if (strictFlag && bitOffset == 12)
+		{
+			return -3; // **ERROR** Single symbol block not valid
+		}
+		endOffset = bitOffset + 3; // end indicator
+		
+		for (bitOffset = 16; bitOffset > endOffset; bitOffset -= 8)
+		{
+			resultString[resultLength++] = (bitField >> bitOffset) & 0xff;
+		}
+
+		if (charIndex == -1) // Was there an illegal character?
+		{
+			if (strictFlag)
+			{
+				return -4; // **ERROR** Bad character in input string
+			}
+			resultString[resultLength++] = (char)charValue;
+		}
+	}
+	return resultLength;
 }

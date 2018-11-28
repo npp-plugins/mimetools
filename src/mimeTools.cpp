@@ -24,7 +24,7 @@
 
 
 const TCHAR PLUGIN_NAME[] = TEXT("MIME Tools");
-const int nbFunc = 14;
+const int nbFunc = 16;
 
 HINSTANCE _hInst;
 NppData nppData;
@@ -38,46 +38,50 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 		{
 			_hInst = (HINSTANCE)hModule;
 			funcItem[0]._pFunc = convertToBase64FromAscii;
-			funcItem[1]._pFunc = convertToBase64FromAscii_B64Format;
-			funcItem[2]._pFunc = convertToAsciiFromBase64;
+			funcItem[1]._pFunc = convertToBase64FromAscii_pad;
+			funcItem[2]._pFunc = convertToBase64FromAscii_B64Format;
+			funcItem[3]._pFunc = convertToAsciiFromBase64;
+			funcItem[4]._pFunc = convertToAsciiFromBase64_strict;
 
-			funcItem[3]._pFunc = NULL;
-			funcItem[4]._pFunc = convertToQuotedPrintable;
-			funcItem[5]._pFunc = convertToAsciiFromQuotedPrintable;
+			funcItem[5]._pFunc = NULL;
+			funcItem[6]._pFunc = convertToQuotedPrintable;
+			funcItem[7]._pFunc = convertToAsciiFromQuotedPrintable;
 
-			funcItem[6]._pFunc = NULL;
-			funcItem[7]._pFunc = convertURLMinEncode;
-			funcItem[8]._pFunc = convertURLFullEncode;
-			funcItem[9]._pFunc = convertURLDecode;
+			funcItem[8]._pFunc = NULL;
+			funcItem[9]._pFunc = convertURLMinEncode;
+			funcItem[10]._pFunc = convertURLFullEncode;
+			funcItem[11]._pFunc = convertURLDecode;
 			
-			funcItem[10]._pFunc = NULL;
-			funcItem[11]._pFunc = convertSamlDecode;
-
 			funcItem[12]._pFunc = NULL;
-			funcItem[13]._pFunc = about;
+			funcItem[13]._pFunc = convertSamlDecode;
+
+			funcItem[14]._pFunc = NULL;
+			funcItem[15]._pFunc = about;
 
 			lstrcpy(funcItem[0]._itemName, TEXT("Base64 Encode"));
-			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with Unix EOL"));
-			lstrcpy(funcItem[2]._itemName, TEXT("Base64 Decode"));
+			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with padding"));
+			lstrcpy(funcItem[2]._itemName, TEXT("Base64 Encode with Unix EOL"));
+			lstrcpy(funcItem[3]._itemName, TEXT("Base64 Decode"));
+			lstrcpy(funcItem[4]._itemName, TEXT("Base64 Decode strict"));
 
-			lstrcpy(funcItem[3]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[5]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[4]._itemName, TEXT("Quoted-printable Encode"));
-			lstrcpy(funcItem[5]._itemName, TEXT("Quoted-printable Decode"));
+			lstrcpy(funcItem[6]._itemName, TEXT("Quoted-printable Encode"));
+			lstrcpy(funcItem[7]._itemName, TEXT("Quoted-printable Decode"));
 			
-			lstrcpy(funcItem[6]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[8]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[7]._itemName, TEXT("URL Encode"));
-			lstrcpy(funcItem[8]._itemName, TEXT("Full URL Encode"));
-			lstrcpy(funcItem[9]._itemName, TEXT("URL Decode"));
-			
-			lstrcpy(funcItem[10]._itemName, TEXT("-SEPARATOR-"));
-
-			lstrcpy(funcItem[11]._itemName, TEXT("SAML Decode"));
+			lstrcpy(funcItem[9]._itemName, TEXT("URL Encode"));
+			lstrcpy(funcItem[10]._itemName, TEXT("Full URL Encode"));
+			lstrcpy(funcItem[11]._itemName, TEXT("URL Decode"));
 			
 			lstrcpy(funcItem[12]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[13]._itemName, TEXT("About"));
+			lstrcpy(funcItem[13]._itemName, TEXT("SAML Decode"));
+			
+			lstrcpy(funcItem[14]._itemName, TEXT("-SEPARATOR-"));
+
+			lstrcpy(funcItem[15]._itemName, TEXT("About"));
 
 			funcItem[0]._init2Check = false;
 			funcItem[1]._init2Check = false;
@@ -93,6 +97,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[11]._init2Check = false;
 			funcItem[12]._init2Check = false;
 			funcItem[13]._init2Check = false;
+			funcItem[14]._init2Check = false;
+			funcItem[15]._init2Check = false;
 
 			// If you don't need the shortcut, you have to make it NULL
 			funcItem[0]._pShKey = NULL;
@@ -109,6 +115,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[11]._pShKey = NULL;
 			funcItem[12]._pShKey = NULL;
 			funcItem[13]._pShKey = NULL;
+			funcItem[14]._pShKey = NULL;
+			funcItem[15]._pShKey = NULL;
 		}
 		break;
 
@@ -161,7 +169,8 @@ extern "C" __declspec(dllexport) LRESULT messageProc(UINT, WPARAM, LPARAM)
 	return TRUE;
 }
 
-HWND getCurrentScintillaHandle() {
+HWND getCurrentScintillaHandle()
+{
     int currentEdit;
     ::SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, 0, (LPARAM)&currentEdit);
 	return (currentEdit == 0)?nppData._scintillaMainHandle:nppData._scintillaSecondHandle;
@@ -169,126 +178,85 @@ HWND getCurrentScintillaHandle() {
 
 
 
+void convertAsciiToBase64(size_t wrapLength, bool padFlag)
+{
+	HWND hCurrScintilla = getCurrentScintillaHandle();
+	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
+	if (selectedLength == 0) return;
+
+	char *selectedText = new char[selectedLength];
+	::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
+
+	size_t bufferLength = (selectedLength + 1) / 3 * 4;
+	if (wrapLength > 0)
+	{
+		bufferLength += bufferLength / wrapLength;
+	}
+	char *encodedText = new char[bufferLength + 1];
+
+	int len = base64Encode(encodedText, selectedText, selectedLength - 1, wrapLength, padFlag);
+	encodedText[len] = '\0';
+
+	::SendMessage(hCurrScintilla, SCI_REPLACESEL, 0, (LPARAM)encodedText);
+
+	delete[] selectedText;
+	delete[] encodedText;
+
+}
+
+
 void convertToBase64FromAscii()
 {
-	asciiToBase64(false);
+	convertAsciiToBase64(0, false);
+}
+
+void convertToBase64FromAscii_pad()
+{
+	convertAsciiToBase64(0, true);
 }
 
 void convertToBase64FromAscii_B64Format()
 {
-	asciiToBase64(true);
+	convertAsciiToBase64(64, true);
 }
 
-void asciiToBase64(bool doFormat)
+
+void convertBase64ToAscii(bool strict)
 {
 	HWND hCurrScintilla = getCurrentScintillaHandle();
+	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
+	if (selectedLength == 0) return;
 
-    size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
-	size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
-	if (end < start)
+	char *selectedText = new char[selectedLength];
+	::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
+
+	char *decodedText = new char[(selectedLength + 2) / 4 * 3 + 1];
+
+	int len = base64Decode(decodedText, selectedText, selectedLength - 1, strict);
+
+	if (len < 0)
 	{
-		size_t tmp = start;
-		start = end;
-		end = tmp;
+		::MessageBox(nppData._nppHandle, TEXT("Problem!"), TEXT("Base64"), MB_OK);
+	}
+	else
+	{
+		decodedText[len] = '\0';
+		::SendMessage(hCurrScintilla, SCI_REPLACESEL, 0, (LPARAM)decodedText);
 	}
 
-	size_t asciiTextLen = end - start;
-    if (asciiTextLen == 0) return;
+	delete[] selectedText;
+	delete[] decodedText;
 
-    UCHAR * pAsciiText = new UCHAR[asciiTextLen+1];
-    
-	TextRange tr;
-	tr.chrg.cpMin = (long)start;
-	tr.chrg.cpMax = (long)end;
-	tr.lpstrText = (char *)pAsciiText;
-	::SendMessage(hCurrScintilla, SCI_GETTEXTRANGE, 0, reinterpret_cast<LPARAM>(&tr));
-
-	size_t b64Len = getBase64LenFromAsciiLen(asciiTextLen);
-	char * pBase64Text = new char[b64Len+1];
-
-	asciiToBase64(pBase64Text, pAsciiText, asciiTextLen);
-	
-	char *pBase64Text2Display = pBase64Text;
-	if (doFormat)
-	{
-		size_t nbEOL = b64Len/64; //nb 0x0A
-		pBase64Text2Display = new char[b64Len+nbEOL+1];
-
-		size_t m = 0, n = 0;
-		for ( ; m < b64Len ; m++)
-		{
-			pBase64Text2Display[n++] = pBase64Text[m];
-
-			if ((m+1)%64 == 0)
-				pBase64Text2Display[n++] = 0x0A;
-		}
-		pBase64Text2Display[n] = '\0';
-	}
-
-	::SendMessage(hCurrScintilla, SCI_REPLACESEL, 0, (LPARAM)pBase64Text2Display);
-	::SendMessage(hCurrScintilla, SCI_SETSEL, start, start+strlen(pBase64Text2Display));
-
-	delete [] pAsciiText;
-	delete [] pBase64Text;
-
-	if (doFormat)
-		delete [] pBase64Text2Display;
 }
 
 void convertToAsciiFromBase64()
 {
-	HWND hCurrScintilla = getCurrentScintillaHandle();
-    size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
-    if (bufLength == 0) return;
+	convertBase64ToAscii(false);
+}
 
-	char * selectedText = new char[bufLength];
-    char * pBase64Text = new char[bufLength];
-    ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
-
-    // this line is added to walk around Scintilla 201 bug
-    bufLength = strlen(selectedText)+1;
-
-	size_t m = 0, n = 0;
-	for ( ; m < bufLength ; )
-	{
-		if (selectedText[m] == 0x0A || selectedText[m] == 0x0D)
-			m++;
-		else
-			pBase64Text[n++] = selectedText[m++];
-	}
-
-	size_t asciiLen = getAsciiLenFromBase64Len(n-1);
-	if (!asciiLen)
-	{
-		::MessageBox(nppData._nppHandle, TEXT("Length of selected text (not including EOL) to be decoded is invalid.\rIt should be mod 4."), TEXT("Base64"), MB_OK);
-		return;
-	}
-
-	char * pAsciiText = new char[asciiLen + 1];
-
-	int len = base64ToAscii(pAsciiText, pBase64Text);
-
-	if (len == -1)
-		::MessageBox(nppData._nppHandle, TEXT("Problem!"), TEXT("Base64"), MB_OK);
-	else
-	{
-		size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
-		size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
-		if (end < start)
-		{
-			size_t tmp = start;
-			start = end;
-			end = tmp;
-		}
-		::SendMessage(hCurrScintilla, SCI_SETTARGETSTART, start, 0);
-		::SendMessage(hCurrScintilla, SCI_SETTARGETEND, end, 0);
-		::SendMessage(hCurrScintilla, SCI_REPLACETARGET, len, (LPARAM)pAsciiText);
-		::SendMessage(hCurrScintilla, SCI_SETSEL, start, start+len);
-	}	
-
-	delete [] pAsciiText;
-	delete [] pBase64Text;
-	delete [] selectedText;
+void convertToAsciiFromBase64_strict()
+{
+	convertBase64ToAscii(true);
 }
 
 void convertURLMinEncode()

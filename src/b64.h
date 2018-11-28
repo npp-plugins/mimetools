@@ -18,14 +18,9 @@
 #ifndef NPP_B64_H
 #define NPP_B64_H
 
-#define ASCII_BITLEN 8
-#define B64_BITLEN 6
 #include <windows.h>
 
-size_t getBase64LenFromAsciiLen(size_t asciiStrLen);
-size_t getAsciiLenFromBase64Len(size_t base64StrLen);
-
-size_t asciiToBase64(char *dest, const UCHAR *asciiStr, size_t asciiStrLen);
-int base64ToAscii(char *dest, const char *base64Str);
+int base64Encode(char *resultString, const char *asciiString, size_t asciiStringLength, size_t wrapLength, bool padFlag);
+int base64Decode(char *resultString, const char *encodedString, size_t encodedStringLength, bool strictFlag);
 
 #endif //NPP_B64_H

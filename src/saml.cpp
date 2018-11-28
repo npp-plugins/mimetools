@@ -38,30 +38,17 @@ int samlDecode(char *dest, const char *encodedSamlStr, int bufLength)
 	return SAML_DECODE_ERROR_URLDECODE;
   }
 
+  char *base64DecodedText = new char[(urlDecodedLen + 3) / 4 * 3 + 1];
 
-  // Base64 Decode
-  char *pBase64Text = new char[urlDecodedLen];
-  memset(pBase64Text, 0, urlDecodedLen);
-  size_t m = 0, n = 0;
-  for ( ; m < urlDecodedLen ; )
-  {
-    if (pUrlDecodedText[m] == 0x0A || pUrlDecodedText[m] == 0x0D)
-      m++;
-    else
-      pBase64Text[n++] = pUrlDecodedText[m++];
-  }
-  delete [] pUrlDecodedText;
-  
-  size_t asciiLen = getAsciiLenFromBase64Len(n);
-  if (!asciiLen)
-  {
-    return SAML_DECODE_ERROR_BASE64DECODE;
-  }
+  int base64DecodedLen = base64Decode(base64DecodedText, pUrlDecodedText, urlDecodedLen, true);
 
-  char *base64DecodedText = new char[asciiLen];
+  delete[] pUrlDecodedText;
 
-  size_t base64DecodedLen = base64ToAscii(base64DecodedText, pBase64Text);
-  delete [] pBase64Text;
+  if (base64DecodedLen < 0)
+		return SAML_DECODE_ERROR_BASE64DECODE;
+
+  base64DecodedText[base64DecodedLen] = '\0';
+
 
   // A SAML message should be longer than 10 chars
   if (base64DecodedLen < 10)
@@ -89,7 +76,8 @@ int samlDecode(char *dest, const char *encodedSamlStr, int bufLength)
   int inflateReturnCode = tinf_uncompress(inflatedText, &inflatedTextLen, base64DecodedText);
   delete [] base64DecodedText;
 
-  if (inflateReturnCode != TINF_OK) {
+  if (inflateReturnCode != TINF_OK)
+  {
 	delete [] inflatedText;
 	return SAML_DECODE_ERROR_INFLATE;
   }

@@ -27,11 +27,13 @@
 #define IDC_STATIC -1
 #endif
 
-void asciiToBase64(bool doFormat);
+
 
 void convertToBase64FromAscii();
+void convertToBase64FromAscii_pad();
 void convertToBase64FromAscii_B64Format();
 void convertToAsciiFromBase64();
+void convertToAsciiFromBase64_strict();
 void convertToQuotedPrintable();
 void convertToAsciiFromQuotedPrintable();
 void convertURLMinEncode();
