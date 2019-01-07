@@ -1,5 +1,5 @@
 //this file is part of MimeTools (plugin for Notepad++)
-//Copyright (C)2007 Don HO <donho@altern.org>
+//Copyright (C)2019 Don HO <don.h@free.fr>
 //
 //This program is free software; you can redistribute it and/or
 //modify it under the terms of the GNU General Public License
@@ -39,7 +39,7 @@ BEGIN
 			VALUE	"FileDescription",	"Base64 encoder/decoder plugin for Notepad++\0"
 			VALUE	"FileVersion",	VERSION_VALUE
 			VALUE	"InternalName",	"base64.dll\0"
-			VALUE	"LegalCopyright",	"Copyright 2007 by Don HO\0"
+			VALUE	"LegalCopyright",	"Copyright 2019 by Don HO\0"
 			VALUE	"OriginalFilename",	"base64.dll\0"
 			VALUE	"ProductName",	"mimeTools\0"
 			VALUE	"ProductVersion",	VERSION_VALUE
@@ -56,6 +56,5 @@ BEGIN
     LTEXT           "Author : Don HO",IDC_STATIC,30,26,54,8
     LTEXT           "Version : ",IDC_STATIC,30,43,31,8
     LTEXT           "Licence : GPL",IDC_STATIC,30,62,43,8
-    LTEXT           "Uses tinf - Copyright (c) 2003 Joergen Ibsen",IDC_STATIC,30,80,160,8
     LTEXT           VERSION_VALUE, IDC_STATIC,65,43,19,8
 END

@@ -1,5 +1,6 @@
 *.suo
 *.sdf
+*.aps
 mimeTools.sln
 mimeTools.ilk
 mimeTools.vcxproj.filters

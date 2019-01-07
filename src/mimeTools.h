@@ -1,5 +1,10 @@
 //this file is part of MimeTools (plugin for Notepad++)
-//Copyright (C)2007 Don HO <donho@altern.org>
+//Copyright (C)2019 Don HO <don.h@free.fr>
+//
+//
+// Enhance Base64 features, and rewrite Base64 encode/decode implementation
+// Copyright 2019 by Paul Nankervis <paulnank@hotmail.com>
+//
 //
 //This program is free software; you can redistribute it and/or
 //modify it under the terms of the GNU General Public License
@@ -32,8 +37,10 @@
 void convertToBase64FromAscii();
 void convertToBase64FromAscii_pad();
 void convertToBase64FromAscii_B64Format();
+void convertToBase64FromAscii_byline();
 void convertToAsciiFromBase64();
 void convertToAsciiFromBase64_strict();
+void convertToAsciiFromBase64_whitespaceReset();
 void convertToQuotedPrintable();
 void convertToAsciiFromQuotedPrintable();
 void convertURLMinEncode();

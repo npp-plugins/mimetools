@@ -38,9 +38,9 @@ int samlDecode(char *dest, const char *encodedSamlStr, int bufLength)
 	return SAML_DECODE_ERROR_URLDECODE;
   }
 
-  char *base64DecodedText = new char[(urlDecodedLen + 3) / 4 * 3 + 1];
+  char *base64DecodedText = new char[urlDecodedLen + 1];
 
-  int base64DecodedLen = base64Decode(base64DecodedText, pUrlDecodedText, urlDecodedLen, true);
+  int base64DecodedLen = base64Decode(base64DecodedText, pUrlDecodedText, urlDecodedLen, true, false);
 
   delete[] pUrlDecodedText;
 
