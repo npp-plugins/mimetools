@@ -198,7 +198,8 @@ void convertAsciiToBase64(size_t wrapLength, bool padFlag, bool byLineFlag)
 	if (selectedLength == 0) return;
 
 	char *selectedText = new char[selectedLength];
-	::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
+	::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
+	::SendMessage(hCurrScintilla, SCI_GETTARGETTEXT, 0, (LPARAM)selectedText);
 
 	size_t bufferLength = (selectedLength + 2) / 3 * 4 + 1;
 	if (wrapLength > 0)
@@ -209,8 +210,9 @@ void convertAsciiToBase64(size_t wrapLength, bool padFlag, bool byLineFlag)
 
 	int len = base64Encode(encodedText, selectedText, selectedLength - 1, wrapLength, padFlag, byLineFlag);
 	encodedText[len] = '\0';
-
-	::SendMessage(hCurrScintilla, SCI_REPLACESEL, 0, (LPARAM)encodedText);
+	
+    ::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
+    ::SendMessage(hCurrScintilla, SCI_REPLACETARGET, len, (LPARAM)encodedText);
 
 	delete[] selectedText;
 	delete[] encodedText;
@@ -246,7 +248,8 @@ void convertBase64ToAscii(bool strictFlag, bool whitespaceReset)
 	if (selectedLength == 0) return;
 
 	char *selectedText = new char[selectedLength];
-	::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
+	::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
+	::SendMessage(hCurrScintilla, SCI_GETTARGETTEXT, 0, (LPARAM)selectedText);
 
 	char *decodedText = new char[selectedLength];
 
@@ -259,7 +262,8 @@ void convertBase64ToAscii(bool strictFlag, bool whitespaceReset)
 	else
 	{
 		decodedText[len] = '\0';
-		::SendMessage(hCurrScintilla, SCI_REPLACESEL, 0, (LPARAM)decodedText);
+		::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
+        ::SendMessage(hCurrScintilla, SCI_REPLACETARGET, len, (LPARAM)decodedText);
 	}
 
 	delete[] selectedText;
