@@ -337,7 +337,8 @@ void convertURLDecode()
   if (bufLength == 0) return;
 
   char * selectedText = new char[bufLength];
-  char * pDecodedText = new char[bufLength];
+  // fix https://github.com/npp-plugins/mimetools/issues/8 bug
+  char * pDecodedText = new char[bufLength*2];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
   // this line is added to walk around Scintilla 201 bug
