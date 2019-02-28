@@ -91,7 +91,6 @@ int UrlToAscii (char* dest, const char* src, int destSize)
       }
       else  // invalid encoding
       {
-        memset (dest, 0, destSize);
         return -1;
       }
     }
