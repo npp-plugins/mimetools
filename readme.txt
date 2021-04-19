@@ -1,4 +1,4 @@
-MIME plugin for Notepad++ implements several main functionnalities defined in MIME (Multipurpose Internet Mail Extensions) :
+MIME plugin for Notepad++ implements several main functionalities defined in MIME (Multipurpose Internet Mail Extensions) :
 1. Base64 Encoding/Decoding
 2. Quoted-printable Encoding/Decoding
 3. URL Encoding/Decoding

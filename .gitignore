@@ -1,6 +1,7 @@
 *.suo
 *.sdf
 *.aps
+*.db
 mimeTools.sln
 mimeTools.ilk
 mimeTools.vcxproj.filters
@@ -8,9 +9,12 @@ mimeTools.vcxproj.user
 UpgradeLog.htm
 bin/
 bin64/
+arm64/
 vs.proj/x64/
 vs.proj/Release/
 vs.proj/Debug/
+vs.proj/.vs/
+vs.proj/ARM64/
 vs.proj/mimeTools.opensdf
 vs.proj/mimeTools.exp
 vs.proj/mimeTools.lib
