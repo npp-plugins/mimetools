@@ -264,6 +264,7 @@ static void tinf_decode_trees(TINF_DATA *d, TINF_TREE *lt, TINF_TREE *dt)
       case 16:
          /* copy previous code length 3-6 times (read 2 bits) */
          {
+            if (num == 0) return;
             unsigned char prev = lengths[num - 1];
             for (length = tinf_read_bits(d, 2, 3); length; --length)
             {
