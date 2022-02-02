@@ -1,7 +1,11 @@
 *.suo
 *.sdf
 *.aps
+<<<<<<< Updated upstream
 *.db
+=======
+*.bak
+>>>>>>> Stashed changes
 mimeTools.sln
 mimeTools.ilk
 mimeTools.vcxproj.filters
