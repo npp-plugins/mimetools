@@ -1,4 +1,4 @@
-// This file is part of Notepad++ plugin MIME Tools project
+// This file is part of Notepad++ project
 // Copyright (C)2021 Don HO <don.h@free.fr>
 
 // This program is free software: you can redistribute it and/or modify
@@ -15,16 +15,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#ifndef PLUGININTERFACE_H
-#define PLUGININTERFACE_H
+#pragma once
 
-#ifndef SCINTILLA_H
 #include "Scintilla.h"
-#endif //SCINTILLA_H
-
-#ifndef NOTEPAD_PLUS_MSGS_H
 #include "Notepad_plus_msgs.h"
-#endif //NOTEPAD_PLUS_MSGS_H
 
 const int nbChar = 64;
 
@@ -32,9 +26,9 @@ typedef const TCHAR * (__cdecl * PFUNCGETNAME)();
 
 struct NppData
 {
-	HWND _nppHandle;
-	HWND _scintillaMainHandle;
-	HWND _scintillaSecondHandle;
+	HWND _nppHandle = nullptr;
+	HWND _scintillaMainHandle = nullptr;
+	HWND _scintillaSecondHandle = nullptr;
 };
 
 typedef void (__cdecl * PFUNCSETINFO)(NppData);
@@ -45,19 +39,19 @@ typedef LRESULT (__cdecl * PMESSAGEPROC)(UINT Message, WPARAM wParam, LPARAM lPa
 
 struct ShortcutKey
 {
-	bool _isCtrl;
-	bool _isAlt;
-	bool _isShift;
-	UCHAR _key;
+	bool _isCtrl = false;
+	bool _isAlt = false;
+	bool _isShift = false;
+	UCHAR _key = 0;
 };
 
 struct FuncItem
 {
-	TCHAR _itemName[nbChar];
-	PFUNCPLUGINCMD _pFunc;
-	int _cmdID;
-	bool _init2Check;
-	ShortcutKey *_pShKey;
+	TCHAR _itemName[nbChar] = { '\0' };
+	PFUNCPLUGINCMD _pFunc = nullptr;
+	int _cmdID = 0;
+	bool _init2Check = false;
+	ShortcutKey *_pShKey = nullptr;
 };
 
 typedef FuncItem * (__cdecl * PFUNCGETFUNCSARRAY)(int *);
@@ -72,5 +66,3 @@ extern "C" __declspec(dllexport) LRESULT messageProc(UINT Message, WPARAM wParam
 // This API return always true now, since Notepad++ isn't compiled in ANSI mode anymore
 extern "C" __declspec(dllexport) BOOL isUnicode();
 
-
-#endif //PLUGININTERFACE_H
