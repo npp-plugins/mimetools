@@ -194,7 +194,7 @@ void convertAsciiToBase64(size_t wrapLength, bool padFlag, bool byLineFlag)
 	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
 	if (selectedLength == 0) return;
 
-	char *selectedText = new char[selectedLength];
+	char *selectedText = new char[selectedLength + 1];
 	::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
 	::SendMessage(hCurrScintilla, SCI_GETTARGETTEXT, 0, (LPARAM)selectedText);
 
@@ -205,7 +205,7 @@ void convertAsciiToBase64(size_t wrapLength, bool padFlag, bool byLineFlag)
 	}
 	char *encodedText = new char[bufferLength + 1];
 
-	int len = base64Encode(encodedText, selectedText, selectedLength - 1, wrapLength, padFlag, byLineFlag);
+	int len = base64Encode(encodedText, selectedText, selectedLength, wrapLength, padFlag, byLineFlag);
 	encodedText[len] = '\0';
 	
     ::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
@@ -244,13 +244,13 @@ void convertBase64ToAscii(bool strictFlag, bool whitespaceReset)
 	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
 	if (selectedLength == 0) return;
 
-	char *selectedText = new char[selectedLength];
+	char *selectedText = new char[selectedLength + 1];
 	::SendMessage(hCurrScintilla, SCI_TARGETFROMSELECTION, 0, 0);
 	::SendMessage(hCurrScintilla, SCI_GETTARGETTEXT, 0, (LPARAM)selectedText);
 
 	char *decodedText = new char[selectedLength];
 
-	int len = base64Decode(decodedText, selectedText, selectedLength - 1, strictFlag, whitespaceReset);
+	int len = base64Decode(decodedText, selectedText, selectedLength, strictFlag, whitespaceReset);
 
 	if (len < 0)
 	{
@@ -300,8 +300,8 @@ void convertURLEncode (bool encodeAll)
   
   if (bufLength == 0) return;
 
-  char * selectedText = new char[bufLength];
-  char * pEncodedText = new char[bufLength*3];
+  char * selectedText = new char[bufLength + 1];
+  char * pEncodedText = new char[bufLength*3 + 1];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
   // this line is added to walk around Scintilla 201 bug
@@ -333,8 +333,8 @@ void convertURLDecode()
   
   if (bufLength == 0) return;
 
-  char * selectedText = new char[bufLength];
-  char * pDecodedText = new char[bufLength];
+  char * selectedText = new char[bufLength + 1];
+  char * pDecodedText = new char[bufLength + 1];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
   // this line is added to walk around Scintilla 201 bug
@@ -372,7 +372,7 @@ void quotedPrintableConvert(qpOp op)
     size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
     if (bufLength == 0) return;
 
-	char * selectedText = new char[bufLength];
+	char * selectedText = new char[bufLength + 1];
     ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
 	char *qpText;
@@ -467,7 +467,7 @@ void convertSamlDecode()
   
   if (bufLength == 0) return;
 
-  char *selectedText = new char[bufLength];
+  char *selectedText = new char[bufLength + 1];
   char *samlDecodedText = new char[SAML_MESSAGE_MAX_SIZE];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
