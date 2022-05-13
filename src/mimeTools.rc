@@ -53,8 +53,8 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "Close",IDCLOSE,86,109,50,14
     GROUPBOX        "MIME Tools",IDC_STATIC,10,9,201,93,BS_CENTER
-    LTEXT           "Author : Don HO",IDC_STATIC,30,26,54,8
+    LTEXT           "Author : Don HO",IDC_STATIC,30,26,70,8
     LTEXT           "Version : ",IDC_STATIC,30,43,31,8
-    LTEXT           "Licence : GPL",IDC_STATIC,30,62,43,8
-    LTEXT           VERSION_VALUE, IDC_STATIC,65,43,19,8
+    LTEXT           VERSION_VALUE, IDC_STATIC,65,43,40,8
+    LTEXT           "Licence : GPL",IDC_STATIC,30,62,60,8
 END
