@@ -490,9 +490,17 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCFIND_REGEXP 0x00200000
 #define SCFIND_POSIX 0x00400000
 #define SCFIND_CXX11REGEX 0x00800000
-#define SCI_FINDTEXT 2150
+
+// Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+// Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+// #define SCI_FINDTEXT 2150
+
 #define SCI_FINDTEXTFULL 2196
-#define SCI_FORMATRANGE 2151
+
+// Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+// Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+// #define SCI_FORMATRANGE 2151
+
 #define SCI_FORMATRANGEFULL 2777
 #define SC_CHANGE_HISTORY_DISABLED 0
 #define SC_CHANGE_HISTORY_ENABLED 1
@@ -511,7 +519,11 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_GETMODIFY 2159
 #define SCI_SETSEL 2160
 #define SCI_GETSELTEXT 2161
-#define SCI_GETTEXTRANGE 2162
+
+// Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+// Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+// #define SCI_GETTEXTRANGE 2162
+
 #define SCI_GETTEXTRANGEFULL 2039
 #define SCI_HIDESELECTION 2163
 #define SCI_GETSELECTIONHIDDEN 2088
@@ -1294,6 +1306,9 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
  * CHARRANGE, TEXTRANGE, FINDTEXTEX, FORMATRANGE, and NMHDR structs.
  * So older code that treats Scintilla as a RichEdit will work. */
 /*
+ * Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+ * Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+ *
 struct Sci_CharacterRange {
 	Sci_PositionCR cpMin;
 	Sci_PositionCR cpMax;
@@ -1304,6 +1319,9 @@ struct Sci_CharacterRangeFull {
 	Sci_Position cpMax;
 };
 /*
+ * Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+ * Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+ *
 struct Sci_TextRange {
 	struct Sci_CharacterRange chrg;
 	char *lpstrText;
@@ -1314,6 +1332,9 @@ struct Sci_TextRangeFull {
 	char *lpstrText;
 };
 /*
+ * Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+ * Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+ *
 struct Sci_TextToFind {
 	struct Sci_CharacterRange chrg;
 	const char *lpstrText;
@@ -1338,6 +1359,9 @@ struct Sci_Rectangle {
 /* This structure is used in printing and requires some of the graphics types
  * from Platform.h.  Not needed by most client code. */
 /*
+ * Deprecated by Notepad++ 2GB+ support via new scintilla interfaces from 5.2.3 (see https://www.scintilla.org/ScintillaHistory.html) 
+ * Please use Sci_Position, SCI_GETTEXTRANGEFULL, SCI_FINDTEXTFULL, and SCI_FORMATRANGEFULL and corresponding defines/structs
+ *
 struct Sci_RangeToFormat {
 	Sci_SurfaceID hdc;
 	Sci_SurfaceID hdcTarget;
