@@ -28,9 +28,10 @@
 const TCHAR PLUGIN_NAME[] = TEXT("MIME Tools");
 const int nbFunc = 18;
 
-HINSTANCE _hInst;
+HINSTANCE g_hInst = nullptr;;
 NppData nppData;
 FuncItem funcItem[nbFunc];
+HWND g_hAboutDlg = nullptr;
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/)
 {
@@ -38,7 +39,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 	{
 		case DLL_PROCESS_ATTACH:
 		{
-			_hInst = (HINSTANCE)hModule;
+			g_hInst = (HINSTANCE)hModule;
 			funcItem[0]._pFunc = convertToBase64FromAscii;
 			funcItem[1]._pFunc = convertToBase64FromAscii_pad;
 			funcItem[2]._pFunc = convertToBase64FromAscii_B64Format;
@@ -158,8 +159,20 @@ extern "C" __declspec(dllexport) FuncItem * getFuncsArray(int *nbF)
 	return funcItem;
 }
 
-extern "C" __declspec(dllexport) void beNotified(SCNotification* /*notifyCode*/)
-{	
+extern "C" __declspec(dllexport) void beNotified(SCNotification* notifyCode)
+{
+	switch (notifyCode->nmhdr.code)
+	{
+		case NPPN_DARKMODECHANGED:
+		{
+			if (g_hAboutDlg)
+			{
+				::SendMessage(nppData._nppHandle, NPPM_DARKMODESUBCLASSANDTHEME, static_cast<WPARAM>(NppDarkMode::dmfHandleChange), reinterpret_cast<LPARAM>(g_hAboutDlg));
+				::SetWindowPos(g_hAboutDlg, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); // to redraw titlebar
+			}
+			break;
+		}
+	}
 }
 
 #ifdef UNICODE
@@ -420,7 +433,7 @@ void convertToQuotedPrintable()
 	quotedPrintableConvert(qp_encode);
 }
 
-BOOL CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM /*lParam*/) 
+BOOL CALLBACK aboutDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
 	switch (message) 
 	{
@@ -430,6 +443,7 @@ BOOL CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM /*lParam*/)
                 case IDCLOSE :
 			    {
 					::EndDialog(hwnd, 0);
+					g_hAboutDlg = nullptr;
 					return  TRUE;
 				}
 			}
@@ -440,7 +454,7 @@ BOOL CALLBACK dlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 
 void about()
 {
-	HWND hSelf = ::CreateDialogParam(_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), nppData._nppHandle, (DLGPROC)dlgProc, (LPARAM)NULL);
+	g_hAboutDlg = ::CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), nppData._nppHandle, (DLGPROC)aboutDlgProc, (LPARAM)NULL);
 		    
 	// Go to center
 	RECT rc;
@@ -453,11 +467,12 @@ void about()
 	::ClientToScreen(nppData._nppHandle, &center);
 
 	RECT dlgRect;
-	::GetClientRect(hSelf, &dlgRect);
+	::GetClientRect(g_hAboutDlg, &dlgRect);
 	int x = center.x - (dlgRect.right - dlgRect.left)/2;
 	int y = center.y - (dlgRect.bottom - dlgRect.top)/2;
+	::SendMessage(nppData._nppHandle, NPPM_DARKMODESUBCLASSANDTHEME, static_cast<WPARAM>(NppDarkMode::dmfInit), reinterpret_cast<LPARAM>(g_hAboutDlg));
 
-	::SetWindowPos(hSelf, HWND_TOP, x, y, (dlgRect.right - dlgRect.left), (dlgRect.bottom - dlgRect.top), SWP_SHOWWINDOW);
+	::SetWindowPos(g_hAboutDlg, HWND_TOP, x, y, (dlgRect.right - dlgRect.left), (dlgRect.bottom - dlgRect.top), SWP_SHOWWINDOW);
 }
 
 void convertSamlDecode()
