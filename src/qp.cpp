@@ -65,7 +65,7 @@ void QuotedPrintable::getQPChar(char c)
 	else
 		_nbCharInLine += _nbChar;
 
-	if (_nbCharInLine >= 76)
+	if (_nbCharInLine >= QP_ENCODED_LINE_LEN_MAX)
 	{
 		_buffer[_i++] = '=';
 		_buffer[_i++] = 0x0D;
