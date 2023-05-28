@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <windows.h>
 
-#define QP_ENCODED_LINE_LEN_MAX 76
+constexpr auto QP_ENCODED_LINE_LEN_MAX = 76;
 
 class QuotedPrintable {
 
@@ -36,13 +36,13 @@ public:
 	char * decode(const char *str);
 
 private:
-	char *_buffer;
-	size_t _bufLen;
-	size_t _i;
-	int _nbCharInLine;
+	char *_buffer = nullptr;
+	size_t _bufLen = 0;
+	size_t _i = 0;
+	int _nbCharInLine = 0;
 	
-	int _nbChar;
-	char _chars[4];
+	int _nbChar = 0;
+	char _chars[4] = {};
 
 	int readQPLine(char **pStr, char *lineBuf);
 	bool translate(char *line2Trans);

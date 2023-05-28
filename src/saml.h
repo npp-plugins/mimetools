@@ -20,12 +20,12 @@
 #include "b64.h"
 #include "url.h"
 
-const int SAML_DECODE_ERROR_URLDECODE = -1;
-const int SAML_DECODE_ERROR_BASE64DECODE = -2;
-const int SAML_DECODE_ERROR_INFLATE = -3;
+constexpr int SAML_DECODE_ERROR_URLDECODE = -1;
+constexpr int SAML_DECODE_ERROR_BASE64DECODE = -2;
+constexpr int SAML_DECODE_ERROR_INFLATE = -3;
 
 
-const int SAML_MESSAGE_MAX_SIZE = 200000;
+constexpr int SAML_MESSAGE_MAX_SIZE = 200000;
 
 int samlDecode(char *dest, const char *samlStr, int bufLength);
 
