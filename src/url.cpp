@@ -23,8 +23,9 @@
 // These characters must be encoded in a URL, as per RFC1738
 static const char gReservedAscii[] = "<>\"#%{}|\\^~[]`;/?:@=& ";  
 static const char gHexChar[] = "0123456789ABCDEF";
+static const char gLineEndings[] = "\r\n";
 
-int AsciiToUrl (char* dest, const char* src, int destSize, bool encodeAll)
+int AsciiToUrl (char* dest, const char* src, int destSize, bool encodeAll, bool perLine)
 {
   int i;
 
@@ -34,7 +35,7 @@ int AsciiToUrl (char* dest, const char* src, int destSize, bool encodeAll)
   {
     // Encode source if it is a reserved or non-printable character.
     //
-    if (encodeAll || (strchr (gReservedAscii, *src) != 0) || !isprint(*src))
+    if ((perLine ? (strchr (gLineEndings, *src) == 0) : true) && (encodeAll || (strchr (gReservedAscii, *src) != 0) || !isprint(*src)))
     {
       *dest++ = '%';
       *dest++ = gHexChar [((*src >> 4) & 0x0f)];
