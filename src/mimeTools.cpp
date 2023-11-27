@@ -55,13 +55,15 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[10]._pFunc = NULL;
 			funcItem[11]._pFunc = convertURLMinEncode;
 			funcItem[12]._pFunc = convertURLFullEncode;
-			funcItem[13]._pFunc = convertURLDecode;
+			funcItem[13]._pFunc = convertURLMinEncode_byline;
+			funcItem[14]._pFunc = convertURLFullEncode_byline;
+			funcItem[15]._pFunc = convertURLDecode;
 			
-			funcItem[14]._pFunc = NULL;
-			funcItem[15]._pFunc = convertSamlDecode;
-
 			funcItem[16]._pFunc = NULL;
-			funcItem[17]._pFunc = about;
+			funcItem[17]._pFunc = convertSamlDecode;
+
+			funcItem[18]._pFunc = NULL;
+			funcItem[19]._pFunc = about;
 
 			lstrcpy(funcItem[0]._itemName, TEXT("Base64 Encode"));
 			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with padding"));
@@ -80,15 +82,17 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 
 			lstrcpy(funcItem[11]._itemName, TEXT("URL Encode"));
 			lstrcpy(funcItem[12]._itemName, TEXT("Full URL Encode"));
-			lstrcpy(funcItem[13]._itemName, TEXT("URL Decode"));
-			
-			lstrcpy(funcItem[14]._itemName, TEXT("-SEPARATOR-"));
-
-			lstrcpy(funcItem[15]._itemName, TEXT("SAML Decode"));
+			lstrcpy(funcItem[13]._itemName, TEXT("URL Encode by line"));
+			lstrcpy(funcItem[14]._itemName, TEXT("Full URL Encode by line"));
+			lstrcpy(funcItem[15]._itemName, TEXT("URL Decode"));
 			
 			lstrcpy(funcItem[16]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[17]._itemName, TEXT("About"));
+			lstrcpy(funcItem[17]._itemName, TEXT("SAML Decode"));
+			
+			lstrcpy(funcItem[18]._itemName, TEXT("-SEPARATOR-"));
+
+			lstrcpy(funcItem[19]._itemName, TEXT("About"));
 
 			funcItem[0]._init2Check = false;
 			funcItem[1]._init2Check = false;
@@ -108,6 +112,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[15]._init2Check = false;
 			funcItem[16]._init2Check = false;
 			funcItem[17]._init2Check = false;
+			funcItem[18]._init2Check = false;
+			funcItem[19]._init2Check = false;
 
 			// If you don't need the shortcut, you have to make it NULL
 			funcItem[0]._pShKey = NULL;
@@ -128,6 +134,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[15]._pShKey = NULL;
 			funcItem[16]._pShKey = NULL;
 			funcItem[17]._pShKey = NULL;
+			funcItem[18]._pShKey = NULL;
+			funcItem[19]._pShKey = NULL;
 		}
 		break;
 
@@ -306,7 +314,17 @@ void convertURLFullEncode()
   convertURLEncode (true);
 }
 
-void convertURLEncode (bool encodeAll)
+void convertURLMinEncode_byline()
+{
+  convertURLEncode (false);
+}
+
+void convertURLFullEncode_byline()
+{
+  convertURLEncode (true);
+}
+
+void convertURLEncode (bool encodeAll, bool byLine)
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
   size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
@@ -320,7 +338,7 @@ void convertURLEncode (bool encodeAll)
   // this line is added to walk around Scintilla 201 bug
   bufLength = strlen(selectedText)+1;
 
-  int len = AsciiToUrl(pEncodedText, selectedText, int(bufLength*3), encodeAll);
+  int len = AsciiToUrl(pEncodedText, selectedText, int(bufLength*3), encodeAll, byLine);
 
   size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
   size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
