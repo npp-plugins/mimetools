@@ -26,7 +26,7 @@
 
 
 const TCHAR PLUGIN_NAME[] = TEXT("MIME Tools");
-const int nbFunc = 18;
+const int nbFunc = 20;
 
 HINSTANCE g_hInst = nullptr;;
 NppData nppData;
