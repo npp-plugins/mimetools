@@ -309,18 +309,18 @@ void convertURLFullEncode()
 void convertURLEncode (bool encodeAll)
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
-  size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
+  size_t selBufLen = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
   
-  if (bufLength == 0) return;
+  if (selBufLen == 0) return;
 
-  char * selectedText = new char[bufLength + 1];
-  char * pEncodedText = new char[bufLength*3 + 1];
+  char * selectedText = new char[selBufLen + 1];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
   // this line is added to walk around Scintilla 201 bug
-  bufLength = strlen(selectedText)+1;
-
-  int len = AsciiToUrl(pEncodedText, selectedText, int(bufLength*3), encodeAll);
+  size_t destBufLen = strlen(selectedText) * 3 + 1;
+  char* pEncodedText = new char[destBufLen];
+  
+  int len = AsciiToUrl(pEncodedText, selectedText, int(destBufLen), encodeAll);
 
   size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
   size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
@@ -342,18 +342,18 @@ void convertURLEncode (bool encodeAll)
 void convertURLDecode()
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
-  size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
+  size_t selBufLen = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
   
-  if (bufLength == 0) return;
+  if (selBufLen == 0) return;
 
-  char * selectedText = new char[bufLength + 1];
-  char * pDecodedText = new char[bufLength + 1];
+  char * selectedText = new char[selBufLen + 1];
   ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
   // this line is added to walk around Scintilla 201 bug
-  bufLength = strlen(selectedText)+1;
+  size_t destBufLen = strlen(selectedText) + 1;
+  char* pDecodedText = new char[destBufLen + 1];
 
-  int len = UrlToAscii(pDecodedText, selectedText, int(bufLength));
+  int len = UrlToAscii(pDecodedText, selectedText, int(destBufLen));
 
   if (len <= -1)
     ::MessageBox(nppData._nppHandle, TEXT("Encoding Invalid!"), TEXT("URL Decode"), MB_OK);
