@@ -18,7 +18,9 @@
 #ifndef NPP_URL_H
 #define NPP_URL_H
 
-int AsciiToUrl (char* dest, const char* src, int destSize, bool encodeAll);
+enum UrlEncodeMethod { RFC1738, extended, full };
+
+int AsciiToUrl (char* dest, const char* src, int destSize, UrlEncodeMethod method);
 int UrlToAscii (char* dest, const char* src, int destSize);
 
 #endif //NPP_URL_H

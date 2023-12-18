@@ -30,7 +30,7 @@
 #define IDC_STATIC -1
 #endif
 
-
+#include "url.h"
 
 void convertToBase64FromAscii();
 void convertToBase64FromAscii_pad();
@@ -42,8 +42,9 @@ void convertToAsciiFromBase64_whitespaceReset();
 void convertToQuotedPrintable();
 void convertToAsciiFromQuotedPrintable();
 void convertURLMinEncode();
+void convertURLEncodeExtended();
 void convertURLFullEncode();
-void convertURLEncode(bool);
+void convertURLEncode(UrlEncodeMethod method);
 void convertURLDecode();
 void convertSamlDecode();
 void convertURLDecode();

@@ -54,14 +54,15 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 
 			funcItem[10]._pFunc = NULL;
 			funcItem[11]._pFunc = convertURLMinEncode;
-			funcItem[12]._pFunc = convertURLFullEncode;
-			funcItem[13]._pFunc = convertURLDecode;
+			funcItem[12]._pFunc = convertURLEncodeExtended;
+			funcItem[13]._pFunc = convertURLFullEncode;
+			funcItem[14]._pFunc = convertURLDecode;
 			
-			funcItem[14]._pFunc = NULL;
-			funcItem[15]._pFunc = convertSamlDecode;
+			funcItem[15]._pFunc = NULL;
+			funcItem[16]._pFunc = convertSamlDecode;
 
-			funcItem[16]._pFunc = NULL;
-			funcItem[17]._pFunc = about;
+			funcItem[17]._pFunc = NULL;
+			funcItem[18]._pFunc = about;
 
 			lstrcpy(funcItem[0]._itemName, TEXT("Base64 Encode"));
 			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with padding"));
@@ -78,17 +79,18 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			
 			lstrcpy(funcItem[10]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[11]._itemName, TEXT("URL Encode"));
-			lstrcpy(funcItem[12]._itemName, TEXT("Full URL Encode"));
-			lstrcpy(funcItem[13]._itemName, TEXT("URL Decode"));
+			lstrcpy(funcItem[11]._itemName, TEXT("URL Encode (RFC1738)"));
+			lstrcpy(funcItem[12]._itemName, TEXT("URL Encode (Extended)"));
+			lstrcpy(funcItem[13]._itemName, TEXT("Full URL Encode"));
+			lstrcpy(funcItem[14]._itemName, TEXT("URL Decode"));
 			
-			lstrcpy(funcItem[14]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[15]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[15]._itemName, TEXT("SAML Decode"));
+			lstrcpy(funcItem[16]._itemName, TEXT("SAML Decode"));
 			
-			lstrcpy(funcItem[16]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[17]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[17]._itemName, TEXT("About"));
+			lstrcpy(funcItem[18]._itemName, TEXT("About"));
 
 			funcItem[0]._init2Check = false;
 			funcItem[1]._init2Check = false;
@@ -298,15 +300,20 @@ void convertToAsciiFromBase64_whitespaceReset()
 
 void convertURLMinEncode()
 {
-  convertURLEncode (false);
+	convertURLEncode (UrlEncodeMethod::RFC1738);
+}
+
+void convertURLEncodeExtended()
+{
+	convertURLEncode (UrlEncodeMethod::extended);
 }
 
 void convertURLFullEncode()
 {
-  convertURLEncode (true);
+	convertURLEncode (UrlEncodeMethod::full);
 }
 
-void convertURLEncode (bool encodeAll)
+void convertURLEncode (UrlEncodeMethod method)
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
   size_t selBufLen = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
@@ -320,7 +327,7 @@ void convertURLEncode (bool encodeAll)
   size_t destBufLen = strlen(selectedText) * 3 + 1;
   char* pEncodedText = new char[destBufLen];
   
-  int len = AsciiToUrl(pEncodedText, selectedText, int(destBufLen), encodeAll);
+  int len = AsciiToUrl(pEncodedText, selectedText, int(destBufLen), method);
 
   size_t start = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONSTART, 0, 0);
   size_t end = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONEND, 0, 0);
