@@ -81,7 +81,7 @@ static const char gExtendedChar[] = "!*'()+$,";
 
 static const char gHexChar[] = "0123456789ABCDEF";
 
-int AsciiToUrl (char* dest, const char* src, int destSize, UrlEncodeMethod method)
+int AsciiToUrl(char* dest, const char* src, int destSize, UrlEncodeMethod method, bool isByLine)
 {
   int i;
   memset (dest, 0, destSize);
@@ -92,9 +92,9 @@ int AsciiToUrl (char* dest, const char* src, int destSize, UrlEncodeMethod metho
 
   for (i = 0; (i < (destSize - 2)) && *src; ++i, ++src)
   {
-    // Encode source if it is a reserved or non-printable character.
-    //
-    if (method == UrlEncodeMethod::full || (strchr (reservedAscii.c_str(), *src) != 0) || !isprint(*src))
+    if ((isByLine ? (strchr("\r\n", *src) != nullptr ? false : true) : true) &&       // if "by line" is demanded and current char is EOL, the false is returned to stop remain tests and EOL is not treated. Otherwise (true) we keep testing... 
+        (method == UrlEncodeMethod::full ||                                           // if encode method is full, true is return to stop remain tests, then we convert the char whatever it is. Otherwise (true) we keep testing...
+            ((strchr(reservedAscii.c_str(), *src) != nullptr) || !isprint(*src))))    // Here we convert only reserved characters or non-printable characters.
     {
       *dest++ = '%';
       *dest++ = gHexChar [((*src >> 4) & 0x0f)];

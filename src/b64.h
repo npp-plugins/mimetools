@@ -15,12 +15,9 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#ifndef NPP_B64_H
-#define NPP_B64_H
+#pragma once
 
 #include <windows.h>
 
 int base64Encode(char *resultString, const char *asciiString, size_t asciiStringLength, size_t wrapLength, bool padFlag, bool byLineFlag);
 int base64Decode(char *resultString, const char *encodedString, size_t encodedStringLength, bool strictFlag, bool whitespaceReset);
-
-#endif //NPP_B64_H

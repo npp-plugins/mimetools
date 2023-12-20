@@ -18,8 +18,7 @@
 // Copyright 2019 by Paul Nankervis <paulnank@hotmail.com>
 
 
-#ifndef NPP_TOOLS_H
-#define NPP_TOOLS_H
+#pragma once
 
 #define VERSION_VALUE "2.9\0"
 #define VERSION_DIGITALVALUE 2, 9, 0, 0
@@ -44,10 +43,12 @@ void convertToAsciiFromQuotedPrintable();
 void convertURLMinEncode();
 void convertURLEncodeExtended();
 void convertURLFullEncode();
-void convertURLEncode(UrlEncodeMethod method);
+void convertURLMinEncodeByLine();
+void convertURLEncodeExtendedByLine();
+void convertURLFullEncodeByLine();
+void convertURLEncode(UrlEncodeMethod method, bool isByLine = false);
 void convertURLDecode();
 void convertSamlDecode();
 void convertURLDecode();
 void about();
 
-#endif //NPP_TOOLS_H

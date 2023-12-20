@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef NPP_SAML_H
-#define NPP_SAML_H
+#pragma once
 
 #include "b64.h"
 #include "url.h"
@@ -29,4 +28,3 @@ constexpr int SAML_MESSAGE_MAX_SIZE = 200000;
 
 int samlDecode(char *dest, const char *samlStr, int bufLength);
 
-#endif //NPP_SAML_H

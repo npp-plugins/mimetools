@@ -15,8 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#ifndef NPP_QP_H
-#define NPP_QP_H
+#pragma once
 
 #include <stdint.h>
 #include <stdio.h>
@@ -89,5 +88,3 @@ private:
 	};
 	
 };
-
-#endif //NPP_QP_H
