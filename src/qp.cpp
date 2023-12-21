@@ -70,6 +70,12 @@ void QuotedPrintable::getQPChar(char c)
 	else
 		_nbCharInLine += _nbChar;
 
+	// Lines of Quoted-Printable encoded data must not be longer than 76 characters.
+	// To satisfy this requirement without altering the encoded text, soft line breaks may be added as desired.
+	// A soft line break consists of an = at the end of an encoded line, and does not appear as a line break in the decoded text.
+	// These soft line breaks also allow encoding text without line breaks (or containing very long lines) for an environment where line size is limited,
+	// such as the 1000 characters per line limit of some SMTP software, as allowed by RFC 2821.
+	// ref: https://en.wikipedia.org/wiki/Quoted-printable
 	if (_nbCharInLine >= QP_ENCODED_LINE_LEN_MAX)
 	{
 		_buffer[_i++] = '=';
@@ -104,22 +110,30 @@ void QuotedPrintable::putQPChar()
 char * QuotedPrintable::decode(const char *str)
 {
 	initVar();
-	char line[QP_ENCODED_LINE_LEN_MAX + 2 + 1];
+	
 	char *p = (char *)str;
 	size_t len = strlen(str);
 	
 	_bufLen = len + 1;
 	_buffer = new char[_bufLen];
-	
+	char* line = new char[_bufLen];
+
 	while (*p)
 	{
 		if (readQPLine(&p, line) == -1)
+		{
+			delete [] line;
 			return NULL;
+		}
 
 		if (!translate(line))
+		{
+			delete[] line;
 			return NULL;
+		}
 	}
 	_buffer[_i] = '\0';
+	delete[] line;
 	return _buffer;
 }
 
@@ -129,7 +143,22 @@ int QuotedPrintable::readQPLine(char **pStr, char *lineBuf)
 	size_t i = 0;
 	for (; i < len ; i++)
 	{
+		// Make decoding more flexible and less strict (76 characters length of encoded text restriction for decoding is removed).
+		// 
+		// Both following encoded format
+		//  
+		// =D1=80=D0=B5=D0=B3=D0=B8=D1=81=D1=82=D1=80=D0=B8=D1=80=D0=BE=D0=B2=D0=B0=D0=BB=D0=B8=D1=81=D1=8C
+		//
+		// and 
+		// 
+		// =D1=80=D0=B5=D0=B3=D0=B8=D1=81=D1=82=D1=80=D0=B8=D1=80=D0=BE=D0=B2=D0=B0=D0=
+		// =BB=D0=B8=D1=81=D1=8C
+		//
+		// are allowed and the result of both are the same.
+
+		/*
 		if (i >= (QP_ENCODED_LINE_LEN_MAX + 2 + 1)) return -1;
+		*/
 
 		char c = (*pStr)[i];
 		if (c == 0x0D)
