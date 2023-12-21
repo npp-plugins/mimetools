@@ -212,6 +212,9 @@ HWND getCurrentScintillaHandle()
 void convertAsciiToBase64(size_t wrapLength, bool padFlag, bool byLineFlag)
 {
 	HWND hCurrScintilla = getCurrentScintillaHandle();
+	size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+	if (nbSelections > 1) return;
+
 	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
 	if (selectedLength == 0) return;
 
@@ -262,6 +265,8 @@ void convertToBase64FromAscii_byline()
 void convertBase64ToAscii(bool strictFlag, bool whitespaceReset)
 {
 	HWND hCurrScintilla = getCurrentScintillaHandle();
+	size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+	if (nbSelections > 1) return;
 	size_t selectedLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
 	if (selectedLength == 0) return;
 
@@ -337,8 +342,9 @@ void convertURLFullEncodeByLine()
 void convertURLEncode (UrlEncodeMethod method, bool isByLine)
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
+  size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+  if (nbSelections > 1) return;
   size_t selBufLen = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
-  
   if (selBufLen == 0) return;
 
   char * selectedText = new char[selBufLen + 1];
@@ -370,8 +376,9 @@ void convertURLEncode (UrlEncodeMethod method, bool isByLine)
 void convertURLDecode()
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
+  size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+  if (nbSelections > 1) return;
   size_t selBufLen = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
-  
   if (selBufLen == 0) return;
 
   char * selectedText = new char[selBufLen + 1];
@@ -410,6 +417,8 @@ enum qpOp {qp_encode, qp_decode};
 void quotedPrintableConvert(qpOp op)
 {
 	HWND hCurrScintilla = getCurrentScintillaHandle();
+	size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+	if (nbSelections > 1) return;
     size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
     if (bufLength == 0) return;
 
@@ -506,8 +515,9 @@ void about()
 void convertSamlDecode()
 {
   HWND hCurrScintilla = getCurrentScintillaHandle();
+  size_t nbSelections = ::SendMessage(hCurrScintilla, SCI_GETSELECTIONS, 0, 0);
+  if (nbSelections > 1) return;
   size_t bufLength = ::SendMessage(hCurrScintilla, SCI_GETSELTEXT, 0, 0);
-  
   if (bufLength == 0) return;
 
   char *selectedText = new char[bufLength + 1];
