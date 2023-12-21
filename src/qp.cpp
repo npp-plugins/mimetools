@@ -23,8 +23,13 @@ char * QuotedPrintable::encode(const char *str)
 	initVar();
 	size_t len = strlen(str);
 	
-	_bufLen = len*2;
+	_bufLen = len * 3;
+	size_t nbEOL = _bufLen / QP_ENCODED_LINE_LEN_MAX;
+	_bufLen += nbEOL * 3;
+	_bufLen += 1;
+
 	_buffer = new char[_bufLen];
+	memset(_buffer, 0, _bufLen);
 	
 	for (size_t i = 0 ; i < len ; i++)
 	{

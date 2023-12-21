@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <windows.h>
 
+// "QP works by using the equals sign = as an escape character.It also limits line length to 76, as some software has limits on line length."
+// ref: https://en.wikipedia.org/wiki/Quoted-printable
 constexpr auto QP_ENCODED_LINE_LEN_MAX = 76;
 
 class QuotedPrintable {
