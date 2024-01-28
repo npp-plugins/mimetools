@@ -20,8 +20,8 @@
 
 #pragma once
 
-#define VERSION_VALUE "3.0\0"
-#define VERSION_DIGITALVALUE 3, 0, 0, 0
+#define VERSION_VALUE "3.1\0"
+#define VERSION_DIGITALVALUE 3, 1, 0, 0
 
 #define IDD_ABOUTBOX 250
 
