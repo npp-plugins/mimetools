@@ -193,7 +193,7 @@ extern "C" __declspec(dllexport) BOOL isUnicode()
 // Here you can process the Npp Messages 
 // I will make the messages accessible little by little, according to the need of plugin development.
 // Please let me know if you need to access to some messages :
-// http://sourceforge.net/forum/forum.php?forum_id=482781
+// https://github.com/notepad-plus-plus/notepad-plus-plus/issues
 //
 extern "C" __declspec(dllexport) LRESULT messageProc(UINT, WPARAM, LPARAM)
 {
