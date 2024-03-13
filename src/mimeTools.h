@@ -34,6 +34,7 @@
 void convertToBase64FromAscii();
 void convertToBase64FromAscii_pad();
 void convertToBase64FromAscii_B64Format();
+void convertToBase64FromAscii_pad_byline();
 void convertToBase64FromAscii_byline();
 void convertToAsciiFromBase64();
 void convertToAsciiFromBase64_strict();

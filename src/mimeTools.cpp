@@ -26,7 +26,7 @@
 
 
 const TCHAR PLUGIN_NAME[] = TEXT("MIME Tools");
-const int nbFunc = 22;
+const int nbFunc = 23;
 
 HINSTANCE g_hInst = nullptr;;
 NppData nppData;
@@ -42,61 +42,63 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			g_hInst = (HINSTANCE)hModule;
 			funcItem[0]._pFunc = convertToBase64FromAscii;
 			funcItem[1]._pFunc = convertToBase64FromAscii_pad;
-			funcItem[2]._pFunc = convertToBase64FromAscii_B64Format;
-			funcItem[3]._pFunc = convertToBase64FromAscii_byline;
-			funcItem[4]._pFunc = convertToAsciiFromBase64;
-			funcItem[5]._pFunc = convertToAsciiFromBase64_strict;
-			funcItem[6]._pFunc = convertToAsciiFromBase64_whitespaceReset;
+			funcItem[2]._pFunc = convertToBase64FromAscii_pad_byline;
+			funcItem[3]._pFunc = convertToBase64FromAscii_B64Format;
+			funcItem[4]._pFunc = convertToBase64FromAscii_byline;
+			funcItem[5]._pFunc = convertToAsciiFromBase64;
+			funcItem[6]._pFunc = convertToAsciiFromBase64_strict;
+			funcItem[7]._pFunc = convertToAsciiFromBase64_whitespaceReset;
 
-			funcItem[7]._pFunc = NULL;
-			funcItem[8]._pFunc = convertToQuotedPrintable;
-			funcItem[9]._pFunc = convertToAsciiFromQuotedPrintable;
+			funcItem[8]._pFunc = NULL;
+			funcItem[9]._pFunc = convertToQuotedPrintable;
+			funcItem[10]._pFunc = convertToAsciiFromQuotedPrintable;
 
-			funcItem[10]._pFunc = NULL;
-			funcItem[11]._pFunc = convertURLMinEncode;
-			funcItem[12]._pFunc = convertURLMinEncodeByLine;
-			funcItem[13]._pFunc = convertURLEncodeExtended;
-			funcItem[14]._pFunc = convertURLEncodeExtendedByLine;
-			funcItem[15]._pFunc = convertURLFullEncode;
-			funcItem[16]._pFunc = convertURLFullEncodeByLine;
-			funcItem[17]._pFunc = convertURLDecode;
+			funcItem[11]._pFunc = NULL;
+			funcItem[12]._pFunc = convertURLMinEncode;
+			funcItem[13]._pFunc = convertURLMinEncodeByLine;
+			funcItem[14]._pFunc = convertURLEncodeExtended;
+			funcItem[15]._pFunc = convertURLEncodeExtendedByLine;
+			funcItem[16]._pFunc = convertURLFullEncode;
+			funcItem[17]._pFunc = convertURLFullEncodeByLine;
+			funcItem[18]._pFunc = convertURLDecode;
 			
-			funcItem[18]._pFunc = NULL;
-			funcItem[19]._pFunc = convertSamlDecode;
+			funcItem[19]._pFunc = NULL;
+			funcItem[20]._pFunc = convertSamlDecode;
 
-			funcItem[20]._pFunc = NULL;
-			funcItem[21]._pFunc = about;
+			funcItem[21]._pFunc = NULL;
+			funcItem[22]._pFunc = about;
 
 			lstrcpy(funcItem[0]._itemName, TEXT("Base64 Encode"));
 			lstrcpy(funcItem[1]._itemName, TEXT("Base64 Encode with padding"));
-			lstrcpy(funcItem[2]._itemName, TEXT("Base64 Encode with Unix EOL"));
-			lstrcpy(funcItem[3]._itemName, TEXT("Base64 Encode by line"));
-			lstrcpy(funcItem[4]._itemName, TEXT("Base64 Decode"));
-			lstrcpy(funcItem[5]._itemName, TEXT("Base64 Decode strict"));
-			lstrcpy(funcItem[6]._itemName, TEXT("Base64 Decode by line"));
+			lstrcpy(funcItem[2]._itemName, TEXT("Base64 Encode with padding by line"));
+			lstrcpy(funcItem[3]._itemName, TEXT("Base64 Encode with Unix EOL"));
+			lstrcpy(funcItem[4]._itemName, TEXT("Base64 Encode by line"));
+			lstrcpy(funcItem[5]._itemName, TEXT("Base64 Decode"));
+			lstrcpy(funcItem[6]._itemName, TEXT("Base64 Decode strict"));
+			lstrcpy(funcItem[7]._itemName, TEXT("Base64 Decode by line"));
 
-			lstrcpy(funcItem[7]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[8]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[8]._itemName, TEXT("Quoted-printable Encode"));
-			lstrcpy(funcItem[9]._itemName, TEXT("Quoted-printable Decode"));
+			lstrcpy(funcItem[9]._itemName, TEXT("Quoted-printable Encode"));
+			lstrcpy(funcItem[10]._itemName, TEXT("Quoted-printable Decode"));
 			
-			lstrcpy(funcItem[10]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[11]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[11]._itemName, TEXT("URL Encode (RFC1738)"));
-			lstrcpy(funcItem[12]._itemName, TEXT("URL Encode (RFC1738) by line"));
-			lstrcpy(funcItem[13]._itemName, TEXT("URL Encode (Extended)"));
-			lstrcpy(funcItem[14]._itemName, TEXT("URL Encode (Extended) by line"));
-			lstrcpy(funcItem[15]._itemName, TEXT("URL Encode (Full)"));
-			lstrcpy(funcItem[16]._itemName, TEXT("URL Encode (Full) by line"));
-			lstrcpy(funcItem[17]._itemName, TEXT("URL Decode"));
+			lstrcpy(funcItem[12]._itemName, TEXT("URL Encode (RFC1738)"));
+			lstrcpy(funcItem[13]._itemName, TEXT("URL Encode (RFC1738) by line"));
+			lstrcpy(funcItem[14]._itemName, TEXT("URL Encode (Extended)"));
+			lstrcpy(funcItem[15]._itemName, TEXT("URL Encode (Extended) by line"));
+			lstrcpy(funcItem[16]._itemName, TEXT("URL Encode (Full)"));
+			lstrcpy(funcItem[17]._itemName, TEXT("URL Encode (Full) by line"));
+			lstrcpy(funcItem[18]._itemName, TEXT("URL Decode"));
 			
-			lstrcpy(funcItem[18]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[19]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[19]._itemName, TEXT("SAML Decode"));
+			lstrcpy(funcItem[20]._itemName, TEXT("SAML Decode"));
 			
-			lstrcpy(funcItem[20]._itemName, TEXT("-SEPARATOR-"));
+			lstrcpy(funcItem[21]._itemName, TEXT("-SEPARATOR-"));
 
-			lstrcpy(funcItem[21]._itemName, TEXT("About"));
+			lstrcpy(funcItem[22]._itemName, TEXT("About"));
 
 			funcItem[0]._init2Check = false;
 			funcItem[1]._init2Check = false;
@@ -116,6 +118,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[15]._init2Check = false;
 			funcItem[16]._init2Check = false;
 			funcItem[17]._init2Check = false;
+			funcItem[18]._init2Check = false;
 
 			// If you don't need the shortcut, you have to make it NULL
 			funcItem[0]._pShKey = NULL;
@@ -136,6 +139,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reasonForCall, LPVOID /*lpReserved*/
 			funcItem[15]._pShKey = NULL;
 			funcItem[16]._pShKey = NULL;
 			funcItem[17]._pShKey = NULL;
+			funcItem[18]._pShKey = NULL;
 		}
 		break;
 
@@ -249,6 +253,11 @@ void convertToBase64FromAscii()
 void convertToBase64FromAscii_pad()
 {
 	convertAsciiToBase64(0, true, false);
+}
+
+void convertToBase64FromAscii_pad_byline()
+{
+	convertAsciiToBase64(0, true, true);
 }
 
 void convertToBase64FromAscii_B64Format()
