@@ -6,3 +6,5 @@ MIME plugin for Notepad++ implements several main functionalities defined in MIM
 
 This plugin is under GPL.
 Don Ho <don.h@free.fr>
+
+Modified on March 12, 2024 by ExSlam.
