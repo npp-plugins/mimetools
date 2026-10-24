@@ -30,7 +30,7 @@ int samlDecode(char* dest, const char* encodedSamlStr, int bufLength)
 
 
 	// URL Decode
-	size_t urlDecodedLen = UrlToAscii(pUrlDecodedText, encodedSamlStr, bufLength);
+	int urlDecodedLen = UrlToAscii(pUrlDecodedText, encodedSamlStr, bufLength);
 
 	if (urlDecodedLen < 0)
 	{
@@ -45,7 +45,10 @@ int samlDecode(char* dest, const char* encodedSamlStr, int bufLength)
 	delete[] pUrlDecodedText;
 
 	if (base64DecodedLen < 0)
+	{
+		delete[] base64DecodedText;
 		return SAML_DECODE_ERROR_BASE64DECODE;
+	}
 
 	base64DecodedText[base64DecodedLen] = '\0';
 
