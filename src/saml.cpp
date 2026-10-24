@@ -21,77 +21,79 @@
 #include "tinf.h"
 
 
-int samlDecode(char *dest, const char *encodedSamlStr, int bufLength)
+int samlDecode(char* dest, const char* encodedSamlStr, int bufLength)
 {
-  char *pUrlDecodedText = new char[bufLength];
-	
-  memset(dest, 0, SAML_MESSAGE_MAX_SIZE);
-  memset(pUrlDecodedText, 0, bufLength);
+	char* pUrlDecodedText = new char[bufLength];
+
+	memset(dest, 0, SAML_MESSAGE_MAX_SIZE);
+	memset(pUrlDecodedText, 0, bufLength);
 
 
-  // URL Decode
-  size_t urlDecodedLen = UrlToAscii(pUrlDecodedText, encodedSamlStr, bufLength);
+	// URL Decode
+	size_t urlDecodedLen = UrlToAscii(pUrlDecodedText, encodedSamlStr, bufLength);
 
-  if (urlDecodedLen < 0)
-  {
-    delete [] pUrlDecodedText;
-	return SAML_DECODE_ERROR_URLDECODE;
-  }
+	if (urlDecodedLen < 0)
+	{
+		delete[] pUrlDecodedText;
+		return SAML_DECODE_ERROR_URLDECODE;
+	}
 
-  char *base64DecodedText = new char[urlDecodedLen + 1];
+	char* base64DecodedText = new char[urlDecodedLen + 1];
 
-  int base64DecodedLen = base64Decode(base64DecodedText, pUrlDecodedText, urlDecodedLen, true, false);
+	int base64DecodedLen = base64Decode(base64DecodedText, pUrlDecodedText, urlDecodedLen, true, false);
 
-  delete[] pUrlDecodedText;
+	delete[] pUrlDecodedText;
 
-  if (base64DecodedLen < 0)
+	if (base64DecodedLen < 0)
 		return SAML_DECODE_ERROR_BASE64DECODE;
 
-  base64DecodedText[base64DecodedLen] = '\0';
+	base64DecodedText[base64DecodedLen] = '\0';
 
 
-  // A SAML message should be longer than 10 chars
-  if (base64DecodedLen < 10)
-  {
-	delete [] base64DecodedText;
-	return SAML_DECODE_ERROR_BASE64DECODE;
-  }
+	// A SAML message should be longer than 10 chars
+	// and must fit in dest (keep 1 byte of headroom for a terminator)
+	if (base64DecodedLen < 10 || base64DecodedLen >= SAML_MESSAGE_MAX_SIZE)
+	{
+		delete[] base64DecodedText;
+		return SAML_DECODE_ERROR_BASE64DECODE;
+	}
 
-  // If the first 5 chars are "<?xml" or "<saml", no need to inflate
-  if (   (base64DecodedText[0] == '<')
-	  && (base64DecodedText[3] == 'm')
-	  && (base64DecodedText[4] == 'l'))
-  {
-	memcpy(dest, base64DecodedText, base64DecodedLen);
-	delete [] base64DecodedText;
-    return int(base64DecodedLen);
-  }
-  
+	// If the first 5 chars are "<?xml" or "<saml", no need to inflate
+	if ((base64DecodedText[0] == '<')
+		&& (base64DecodedText[3] == 'm')
+		&& (base64DecodedText[4] == 'l'))
+	{
+		memcpy(dest, base64DecodedText, base64DecodedLen);
+		delete[] base64DecodedText;
+		return int(base64DecodedLen);
+	}
 
-  // Inflate the Base64 decoded text
-  char *inflatedText = new char[SAML_MESSAGE_MAX_SIZE];
-  unsigned int inflatedTextLen = 0;
-  
-  tinf_init();
-  int inflateReturnCode = tinf_uncompress(inflatedText, &inflatedTextLen, base64DecodedText);
-  delete [] base64DecodedText;
 
-  if (inflateReturnCode != TINF_OK)
-  {
-	delete [] inflatedText;
-	return SAML_DECODE_ERROR_INFLATE;
-  }
-  
-  memcpy(dest, inflatedText, inflatedTextLen);
-  delete [] inflatedText;
-  
-  // If the first 5 chars are not "<?xml" or "<saml", there's a problem
-  if (!( (dest[0] == '<')
-	  && (dest[3] == 'm')
-	  && (dest[4] == 'l')))
-  {
-	  return SAML_DECODE_ERROR_INFLATE;
-  }
-  return int(inflatedTextLen);
-  
+	// Inflate the Base64 decoded text
+	char* inflatedText = new char[SAML_MESSAGE_MAX_SIZE];
+	// IN: capacity of inflatedText (and of dest); OUT: bytes produced
+	unsigned int inflatedTextLen = SAML_MESSAGE_MAX_SIZE - 1;
+
+	tinf_init();
+	int inflateReturnCode = tinf_uncompress(inflatedText, &inflatedTextLen, base64DecodedText);
+	delete[] base64DecodedText;
+
+	if (inflateReturnCode != TINF_OK)
+	{
+		delete[] inflatedText;
+		return SAML_DECODE_ERROR_INFLATE;
+	}
+
+	memcpy(dest, inflatedText, inflatedTextLen);
+	delete[] inflatedText;
+
+	// If the first 5 chars are not "<?xml" or "<saml", there's a problem
+	if (!((dest[0] == '<')
+		&& (dest[3] == 'm')
+		&& (dest[4] == 'l')))
+	{
+		return SAML_DECODE_ERROR_INFLATE;
+	}
+	return int(inflatedTextLen);
+
 }
